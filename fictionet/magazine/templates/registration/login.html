@@ -1,0 +1,27 @@
+{% extends "magazine/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login {% endblock title %}
+
+{% block content %}
+<div class="container-fluid mt-5 mx-5">
+  <div class="row">
+    <div class="col-md-4 offset-md-4 text-center">
+      <h2>Log In</h2>
+      <hr/>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 offset-md-4">
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="mt-1">
+          <button type="submit" class="btn btn-lg btn-success float-start">Sign In</button>
+          <span class="float-end mt-3">Not registered? <a href="{% url 'magazine:signup' %}">Sign Up</a></span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

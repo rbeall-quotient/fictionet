@@ -1,0 +1,27 @@
+.fictionet-bar-dropdown-toggle::after {
+    content: none;
+}
+
+.user-field-set
+{
+    width: 60%;
+}
+
+.user-profile-image
+{
+    height: 250px;
+    width: 250px;
+}
+
+.profile-picture
+{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.image-preview
+{
+    height: 250px;
+    width: auto;
+}
