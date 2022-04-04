@@ -1,0 +1,47 @@
+{% extends "magazine/base.html" %}
+
+{% block title %}{{ user.username }} profile {% endblock title %}
+{% load static %}
+{% block content %}
+<div class="container mt-5 mx-5">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="user-profile-image border border-5">
+        {% if user.profile.profile_picture %}
+          <img src="{% get_media_prefix %}{{user.profile.profile_picture}}" class="profile-picture" />
+        {% else %}
+          <img src="{% get_media_prefix %}blank-profile.png" class="profile-picture" />
+        {% endif %}
+        <div class="user-full-name text-center h2 mt-3">
+        {% if user.first_name and user.last_name %}
+          {{user.first_name}} {{user.last_name}}
+        {% else %}
+          {{user.username}}
+        {% endif %}
+      </div>
+      </div>
+    </div>
+    <div class="col-md-9 border-start px-5">
+      <div class="user-fields">
+        <div class="user-field-set">
+          <h4>Email</h4>
+          <p>{{ user.email }}</p>
+        </div>
+        <div class="user-field-set">
+          <h4>Phone Number</h4>
+          <p>{{ user.profile.phone_number }}</p>
+        </div>
+        <div class="user-field-set">
+          <h4>Biography</h4>
+          <p>{{ user.profile.bio }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-9 offset-md-3 px-5">
+      <a id="update-profile" href="{% url 'magazine:edit-profile' %}" class="btn btn-success">Update Profile</a>
+    </div>
+  </div>
+</div>
+{% endblock content %}
