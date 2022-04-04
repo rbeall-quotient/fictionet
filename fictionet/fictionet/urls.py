@@ -18,9 +18,11 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from magazine import views
 
+from fictionet import settings
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path('fictionet/', include('magazine.urls')),
     path('', views.index, name='index'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
