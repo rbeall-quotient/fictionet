@@ -16,10 +16,12 @@ from .models import Story
 def index(request):
     return render(request, 'magazine/index.html')
 
+
 class SignUp(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
+
 
 def profile(request):
     return render(request, 'magazine/profile.html')
@@ -57,8 +59,6 @@ def edit_profile(request):
             request.user.profile.bio = data['bio']
         request.user.save()
         return HttpResponseRedirect(reverse('magazine:profile'))
-
-
 
 
 def edit_story(request, story_id=None):
