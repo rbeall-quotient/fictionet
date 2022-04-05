@@ -1,0 +1,36 @@
+{% extends "magazine/base.html" %}
+{% load static %}
+{% load ratings %}
+
+{% block head_css_page %}<link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">{% endblock head_css_page %}
+
+{% block title %} {{story.title}} by {{story.author.first_name}} {{story.author.last_name}} {% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10 offset-md-1 bg-light p-5 my-5">
+            {% if story.author.pk == user.pk%}<div><a href="{% url 'magazine:edit-story' story.pk %}" class="btn btn-lg btn-success float-end">Edit Story</a></div>{% endif %}
+            <div class="">
+                <h1>{{story.title}}{% if story.subtitle %}: <span class="text-black">{{story.subtitle}}</span>{% endif %}</h1>
+            </div>
+            <div class="fst-italic">By {{story.author.first_name}} {{story.author.last_name}}</div>
+            <hr/>
+            {% autoescape off %}
+                {{ story.content }}
+            {% endautoescape %}
+            <div class="float-end">
+                {% if user.pk == story.author.pk %}
+                    {% ratings story read_only %}
+                {% else %}
+                    {% ratings story %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_javascript_page %}
+    <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+{% endblock footer_javascript_page %}

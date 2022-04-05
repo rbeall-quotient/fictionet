@@ -1,13 +1,47 @@
 {% extends "magazine/base.html" %}
 
-{% block title %}Edit Profile {% endblock title %}
+{% block title %}{% if story %}Edit {{story.title}}{% else %}Add a new story{% endif %} {% endblock title %}
 {% load crispy_forms_tags %}
 {% load static %}
 {% block content %}
-<div class="mt-5 text-center"><h1>Add a new story</h1></div>
-<form action="{% url 'magazine:edit-story' %}" method="post">
-    {{form.media}}
-    {{form.as_p}}
-    <input type="submit" value="Submit">
+<div class="mt-5 text-center"><h1>{% if story %}Edit {{story.title}}{% else %}Add a new story{% endif %}</h1></div>
+<form action="{% if story %}{% url 'magazine:edit-story' story.id %}{% else %}{% url 'magazine:add-story' %}{% endif %}" method="post">
+    {% csrf_token %}
+    <div class="container-fluid align-items-center">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                {{form.title|as_crispy_field}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                {{form.subtitle|as_crispy_field}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 offset-md-3">
+                {{form.genre|as_crispy_field}}
+            </div>
+            <div class="col-md-3">
+                {{form.tags|as_crispy_field}}
+            </div>
+        </div>
+        <div class="row mb-5">
+            <div class="col-md-8 offset-md-2 d-flex justify-content-center">
+                {{form.media}}
+                {{form.content}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <input type="submit" value="Submit" class="btn btn-success btn-lg float-end">
+                {% if story %}
+                    <a type="text" class="btn btn-secondary btn-lg float-end mx-2" href="{% url 'magazine:story' story.pk %}">Cancel</a>
+                {% else %}
+                    <a type="text" class="btn btn-secondary btn-lg float-end mx-2" href="{% url 'magazine:index' %}">Cancel</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </form>
 {% endblock %}

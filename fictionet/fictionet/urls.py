@@ -25,4 +25,5 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path('fictionet/', include('magazine.urls')),
     path('', views.index, name='index'),
+    path('ratings/', include('star_ratings.urls', namespace='ratings')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

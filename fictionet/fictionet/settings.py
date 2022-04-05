@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-827dsa(j=g^ur5xx=ph*lwn)wxv#gs!)5%lgfwd!r4*6andj3$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -149,3 +149,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 PHONENUMBER_DB_FORMAT = 'NATIONAL'
 PHONENUMBER_DEFAULT_REGION = 'US'
+
+STAR_RATINGS_CLEARABLE = True
+STAR_RATINGS_RERATE = False
+STAR_RATINGS_RERATE_SAME_DELETE = False

@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -61,24 +62,51 @@ def edit_profile(request):
         return HttpResponseRedirect(reverse('magazine:profile'))
 
 
-def edit_story(request, story_id=None):
+def story(request, pk):
+    story = get_object_or_404(Story, pk=pk)
+    return render(request, 'magazine/story.html', {'story': story})
+
+
+def add_story(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = StoryForm(request.POST)
+        form = StoryForm(request.POST or None)
         # check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('')
+            story = form.save(commit=False)
+            story.author = request.user
+            story.save()
+            return HttpResponseRedirect(reverse("magazine:index"))
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        if story_id is not None:
-            story_instance = get_object_or_404(Story, pk=story_id)
-            form = StoryForm(instance=story_instance)
-        else:
-            form = StoryForm()
+        form = StoryForm()
 
     return render(request, 'magazine/storyform.html', {'form': form})
+
+
+def edit_story(request, pk):
+    story_instance = get_object_or_404(Story, pk=pk)
+    print(story_instance.author.first_name)
+
+    if story_instance.author.pk is not request.user.pk:
+        raise PermissionDenied()
+
+    form = StoryForm(request.POST or None, instance=story_instance)
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # check whether it's valid:
+        if form.is_valid():
+            print(str(form.cleaned_data["tags"]))
+            story = form.save(commit=False)
+            tags = form.cleaned_data['tags']
+
+            story.tags.clear()
+
+            for tag in tags:
+                story.tags.add(tag)
+
+            story.save()
+            return HttpResponseRedirect(reverse('magazine:story', args=(story.pk,)))
+
+    return render(request, 'magazine/storyform.html', {'form': form, 'story': story_instance})

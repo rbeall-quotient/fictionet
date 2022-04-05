@@ -43,7 +43,7 @@ class Submission(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     content = RichTextField()
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     class Meta:
         abstract = True
@@ -53,7 +53,7 @@ class Submission(models.Model):
 
 
 class Story(Submission):
-    subtitle = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=200, blank=True)
     ratings = GenericRelation(Rating, related_query_name='storys')
 
     class Genre(models.TextChoices):
