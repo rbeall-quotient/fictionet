@@ -9,6 +9,8 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView
 # Create your views here.
 from fictionet import settings
+from .forms import StoryForm
+from .models import Story
 
 
 def index(request):
@@ -55,3 +57,28 @@ def edit_profile(request):
             request.user.profile.bio = data['bio']
         request.user.save()
         return HttpResponseRedirect(reverse('magazine:profile'))
+
+
+
+
+def edit_story(request, story_id=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = StoryForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        if story_id is not None:
+            story_instance = get_object_or_404(Story, pk=story_id)
+            form = StoryForm(instance=story_instance)
+        else:
+            form = StoryForm()
+
+    return render(request, 'magazine/storyform.html', {'form': form})
