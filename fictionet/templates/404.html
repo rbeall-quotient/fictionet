@@ -1,0 +1,20 @@
+{% extends "magazine/base.html" %}
+
+{% block title %}Edit Profile {% endblock title %}
+{% load static %}
+{% block content %}
+<div class="container-fluid mt-5 mx-5">
+  <div class="row">
+    <div class="col-md-4 offset-md-4">
+      <h1><i class="fa-solid fa-circle-exclamation text-danger"></i> ERROR 404</h1>
+      <p>
+        {% if message %}
+          {{message}}
+        {% else %}
+          The page you are looking for does not exist.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
