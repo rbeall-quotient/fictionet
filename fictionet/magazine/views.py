@@ -3,7 +3,8 @@ import os
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponseRedirect
+from django.core import serializers
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
@@ -11,7 +12,7 @@ from django.views.generic import CreateView
 # Create your views here.
 from fictionet import settings
 from .forms import StoryForm
-from .models import Story
+from .models import Story, Favorite
 
 
 def index(request):
@@ -64,7 +65,17 @@ def edit_profile(request):
 
 def story(request, pk):
     story = get_object_or_404(Story, pk=pk)
-    return render(request, 'magazine/story.html', {'story': story})
+    user_fav = False
+    if story.favorite_set.exists():
+        favorites = story.favorite_set.filter()
+        try:
+            user_fav = story.favorite_set.filter(user=request.user).count() > 0
+            #user_fav = True
+        except Favorite.DoesNotExist:
+            user_fav = False
+    else:
+        favorites = []
+    return render(request, 'magazine/story.html', {'story': story, 'favorites': favorites, 'user_fav': user_fav})
 
 
 def add_story(request):
@@ -110,3 +121,48 @@ def edit_story(request, pk):
             return HttpResponseRedirect(reverse('magazine:story', args=(story.pk,)))
 
     return render(request, 'magazine/storyform.html', {'form': form, 'story': story_instance})
+
+
+def favorites_count(request, pk):
+    story_instance = get_object_or_404(Story, pk=pk)
+
+    if story_instance.favorite_set.exists():
+        print(story_instance.favorite_set.count())
+        return JsonResponse({'count': story_instance.favorite_set.count()})
+    else:
+        print("favorite set does not exist")
+        return JsonResponse({'count': 0})
+
+
+def add_favorite(request, pk):
+    if request.is_ajax and request.method == 'POST':
+        story_instance = get_object_or_404(Story, pk=pk)
+        if not story_instance.favorite_set.exists() or story_instance.favorite_set.filter(user=request.user).count() == 0:
+            fav = Favorite()
+            fav.user = request.user
+            fav.story = story_instance
+            fav.name = "user_" + str(fav.user.pk) + "--" + fav.story.title
+            fav.save()
+
+            return JsonResponse({"message": "favorite added", "count": story_instance.favorite_set.count()})
+
+        if story_instance.favorite_set.exists():
+            return JsonResponse({"message": "Favorite already exists for user", "count": story_instance.favorite_set.count()})
+        else:
+            return JsonResponse({"message": "Favorite already exists for user", "count": 0})
+    else:
+        raise PermissionDenied()
+
+def remove_favorite(request, pk):
+    if request.is_ajax and request.method == 'POST':
+        story_instance = get_object_or_404(Story, pk=pk)
+
+        if story_instance.favorite_set.exists:
+            try:
+                fav = story_instance.favorite_set.get(user=request.user)
+                fav.delete()
+                return JsonResponse({"message": "Favorite removed", "count": story_instance.favorite_set.count()})
+            except Favorite.DoesNotExist:
+                return JsonResponse({"message": "Favorite not found", "count": story_instance.favorite_set.count()})
+    else:
+        raise PermissionDenied()

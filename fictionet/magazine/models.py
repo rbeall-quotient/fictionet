@@ -40,6 +40,8 @@ class profile(models.Model):
 
 
 class Submission(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     content = RichTextField()
@@ -70,3 +72,16 @@ class Story(Submission):
         choices=Genre.choices,
         default=Genre.LIT_FIC,
     )
+
+
+class Favorite(models.Model):
+    name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    story = models.ForeignKey(Story, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('name', 'story',)
+
+    def __str__(self):
+        return self.name
+

@@ -14,16 +14,22 @@
             <div class="">
                 <h1>{{story.title}}{% if story.subtitle %}: <span class="text-black">{{story.subtitle}}</span>{% endif %}</h1>
             </div>
-            <div class="fst-italic">By {{story.author.first_name}} {{story.author.last_name}}</div>
+            <div class="">By {{story.author.first_name}} {{story.author.last_name}}</div>
+            <div class="fst-italic text-secondary">Published {{story.created}}</div>
             <hr/>
             {% autoescape off %}
                 {{ story.content }}
             {% endautoescape %}
             <div class="float-end">
-                {% if user.pk == story.author.pk %}
-                    {% ratings story read_only %}
+                {% if user.pk == story.author.pk or not user.is_authenticated %}
+                    <i class="fa-solid fa-heart h5 text-secondary"></i>
+                    <span class="h5">{{favorites|length}}</span>
+                {% elif user_fav %}
+                    <i id="favorites-icon" class="fa-solid fa-heart text-success h5" style="cursor:pointer" data-csrf="{{csrf_token}}" data-add="{% url 'magazine:add-favorite' story.pk %}" data-remove="{% url 'magazine:remove-favorite' story.pk %}" data-clicked="True"></i>
+                    <span class="h5" data-url="{% url 'magazine:favorites-count' story.pk %}" id="favorites-count">{{favorites|length}}</span>
                 {% else %}
-                    {% ratings story %}
+                    <i id="favorites-icon" class="fa-regular fa-heart text-success h5" style="cursor:pointer" data-csrf="{{csrf_token}}" data-add="{% url 'magazine:add-favorite' story.pk %}" data-remove="{% url 'magazine:remove-favorite' story.pk %}"></i>
+                    <span class="h5" data-url="{% url 'magazine:favorites-count' story.pk %}" id="favorites-count">{{favorites|length}}</span>
                 {% endif %}
             </div>
         </div>
@@ -32,5 +38,6 @@
 {% endblock %}
 
 {% block footer_javascript_page %}
+    <script type="application/javascript" src="{% static 'magazine/js/fictionet-story.js' %}"></script>
     <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
 {% endblock footer_javascript_page %}
